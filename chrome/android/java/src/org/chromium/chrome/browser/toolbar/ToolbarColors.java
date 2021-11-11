@@ -19,8 +19,7 @@ public class ToolbarColors {
      * @param context The activity context.
      */
     public static boolean canUseIncognitoToolbarThemeColorInOverview(Context context) {
-        final boolean isAccessibilityEnabled =
-                DeviceClassManager.enableAccessibilityLayout(context);
+        final boolean isAccessibilityEnabled = DeviceClassManager.enableAccessibilityLayout();
         final boolean isTabGridEnabled = TabUiFeatureUtilities.isGridTabSwitcherEnabled(context);
         final boolean isStartSurfaceEnabled =
                 ReturnToChromeExperimentsUtil.isStartSurfaceHomepageEnabled();

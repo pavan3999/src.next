@@ -122,22 +122,16 @@ const std::string& CSPInfo::GetExtensionPagesCSP(const Extension* extension) {
 const std::string* CSPInfo::GetDefaultCSPToAppend(
     const Extension& extension,
     const std::string& relative_path) {
-  if (!extension.is_extension())
+  if (!extension.is_extension() || extension.manifest_version() < 3)
     return nullptr;
 
-  // For sandboxed pages and manifest V2 extensions, append the parsed CSP. This
-  // helps ensure that extension's can't get around our parsing rules by CSP
-  // modifications through, say service workers.
+  // TODO(karandeepb): Extend this to Sandboxed pages as well in the future to
+  // ensure an extension can't use its Service worker to modify the sandboxed
+  // page CSP and get around the corresponding CSP restrictions.
   if (SandboxedPageInfo::IsSandboxedPage(&extension, relative_path))
-    return &GetSandboxContentSecurityPolicy(&extension);
+    return nullptr;
 
-  if (extension.manifest_version() <= 2)
-    return &GetExtensionPagesCSP(&extension);
-
-  // For manifest V3 extensions, append the default secure CSP. This
-  // additionally helps protect against bugs in our CSP parsing code which may
-  // cause the parsed CSP to not be as strong as the default one. For example,
-  // see crbug.com/1042963.
+  // We only enforce a default CSP currently for MV3 extension pages.
   static const base::NoDestructor<std::string> default_csp(kDefaultSecureCSP);
   return default_csp.get();
 }
